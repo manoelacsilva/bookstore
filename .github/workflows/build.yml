@@ -37,5 +37,6 @@ jobs:
     - name: Test
       env:
         DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]"
+        SECRET_KEY: "foo"
       run: |
         poetry run python manage.py test
