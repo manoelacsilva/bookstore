@@ -35,5 +35,7 @@ jobs:
         python -m poetry install
 
     - name: Test
+      env:
+        DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]"
       run: |
         poetry run python manage.py test
