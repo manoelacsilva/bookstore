@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.12]
+        python-version: [3.11]
 
     runs-on: ubuntu-latest
 
@@ -29,7 +29,9 @@ jobs:
 
     - name: Install dependencies
       shell: bash
-      run: python -m poetry install
+      run: | 
+        python -m poetry lock
+        python -m poetry install
 
     - name: Test
       run: |
