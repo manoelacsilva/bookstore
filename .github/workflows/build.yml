@@ -1,13 +1,13 @@
 name: Python application
 
-on: push
+on: [push]
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.12]
+        python-version: [3.8, 3.9]
 
     runs-on: ubuntu-latest
 
@@ -24,19 +24,13 @@ jobs:
         python -m ensurepip
         python -m pip install --upgrade pip
         python -m pip install --upgrade poetry
-
     - name: View poetry --help
       run: poetry --help
 
     - name: Install dependencies
       shell: bash
-      run: |
-        python -m poetry env use python${{ matrix.python-version }}
-        python -m poetry install
+      run: python -m poetry install
 
     - name: Test
-      env:
-        DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]"
-        SECRET_KEY: "foo"
       run: |
         poetry run python manage.py test
