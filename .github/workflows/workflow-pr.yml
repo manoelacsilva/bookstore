@@ -1,38 +1,47 @@
 name: Python Pull Request Workflow
+
 on: [pull_request]
 jobs:
+    qa:
+        name: Quality check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - name: Set up Python
+              uses: actions/setup-python@master
+              with:
+                python-version: 3.11
+            
+            - name: Install poetry
+              run: |
+                pip install -U pip
+                pip install poetry
+                poetry lock
+                poetry install
+              env:
+                POETRY_VIRTUALENVS_CREATE: false
 
-  qa:
-    name: Quality check
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v1
-      - name: Set up Python
-        uses: actions/setup-python@master
-        with:
-          python-version: 3.8
-      - name: Install poetry
-        run: |
-          pip install -U pip
-          pip install poetry
-          poetry install
-        env:
-          POETRY_VIRTUALENVS_CREATE: false
+            - name: View poetry --help
+              run: poetry --help
 
-      - name: View poetry --help
-        run: poetry --help
+            - name: Install dependencies
+              shell: bash
+              run: python -m poetry install
 
-      - name: Install dependencies
-        shell: bash
-        run: python -m poetry install
+            - name: Making migrations
+              shell: bash
+              run: python manage.py migrate
 
-      - name: Test
-        run: |
-          poetry run python manage.py test
-      - name: Wemake Python Stylguide
-        uses: wemake-services/wemake-python-styleguide@0.16.0
-        continue-on-error: true
-        with:
-          reporter: 'github-pr-review'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Test
+              run: |
+                poetry run python manage.py test
+              env:
+                SECRET_KEY: 99k8i6-cqo=x4p*9%8-z+#s!-=
+
+            - name: Wemake Python Styleguide
+              uses: wemake-services/wemake-python-styleguide@0.18.0
+              continue-on-error: true
+              with:
+                reporter: 'github-pr-review'
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
